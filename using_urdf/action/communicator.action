@@ -1,0 +1,14 @@
+#goal definition
+uint16 pose
+uint16[] servo 
+int16[] angle
+uint16 duration
+uint16 size
+---
+#result definition
+uint16 end_angle
+uint16 end_time 
+---
+#feedback
+uint16 current_angle
+uint16 current_time

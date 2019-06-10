@@ -63,7 +63,7 @@ void client::Client::CallBackMsg(const std_msgs::StringConstPtr &msg)
   }
 
   goal.goal.duration = messages[sz];
-  std::cout << "SZ: " << messages[sz] << std::endl;
+
   ac.sendGoal(goal.goal);
   iterator = 0;
 }
@@ -80,9 +80,6 @@ int main(int argc, char **argv)
 {
 
   ros::init(argc, argv, "client");
-
-  // create the action client
-  // true causes the client to spin its own thread
 
   client::Client c;
   c.run();

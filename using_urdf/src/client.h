@@ -4,6 +4,7 @@
 #include <thread>
 #include <std_msgs/String.h>
 
+
 namespace client
 {
 class Client

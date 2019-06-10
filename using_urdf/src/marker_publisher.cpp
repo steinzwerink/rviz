@@ -63,19 +63,29 @@ void Marker::Marker::markerCallback()
         differenceoW = std::abs(transformHand.getRotation().getW() - this->oW);
       }
       this->stucked = true;
-
       this->x = ((transformGripper_right.getOrigin().getX() + transformGripper_left.getOrigin().getX()) / 2) + differenceX;
       this->y = ((transformGripper_right.getOrigin().getY() + transformGripper_left.getOrigin().getY()) / 2) + differenceY;
       this->z = ((transformGripper_right.getOrigin().getZ() + transformGripper_left.getOrigin().getZ()) / 2) + differenceZ;
-      this->oX = (transformHand.getRotation().getX() - differenceoX) ;
-      this->oY = (transformHand.getRotation().getY() - differenceoY) ;
-      this->oZ = (transformHand.getRotation().getZ() - differenceoZ) ;
-      this->oW = (transformHand.getRotation().getW() - differenceoW) ;
+      // this->oX = (transformHand.getRotation().getX() - differenceoX) ;
+      //this->oY = (transformHand.getRotation().getY() - differenceoY) ;
+      //this->oZ = (transformHand.getRotation().getZ() - differenceoZ) ;
+      //this->oW = (transformHand.getRotation().getW() - differenceoW) ;
+
+
       this->displayMarker();
     }
     else
     {
       this->stucked = false;
+
+    
+    }
+    if (this->stucked == false && (this->z > 0))
+    {
+ 
+      this->z =this->z- 0.000005;
+    
+      this->displayMarker();
     }
   }
 }

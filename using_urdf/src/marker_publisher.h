@@ -5,6 +5,7 @@
 #include "tf2_msgs/TFMessage.h"
 #include "std_msgs/String.h"
 #include <string>
+#include <thread>
 
 namespace Marker
 {
@@ -15,7 +16,7 @@ public:
     virtual ~Marker();
     void markerCallback();
     ros::NodeHandle n;
-    void displayMarker();
+    static void displayMarker(Marker* m);
 
 private:
     double x;
@@ -34,6 +35,8 @@ private:
     double differenceoZ = 0;
     double differenceoW = 0;
     bool stucked = false;
+    bool checkStucked(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
+    void setDifferences(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
     std::string name;
     ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
     uint32_t shape = visualization_msgs::Marker::CYLINDER;

@@ -59,11 +59,26 @@ void Marker::Marker::markerCallback()
     {
       this->stucked = false;
     }
+
+    if (this->stucked == false && this->z < 0.3)
+    {
+      if (isGripperLeftCollision(transformGripper_left, transformGripper_right))
+      {
+        this->x = transformGripper_left.getOrigin().getX() + differenceX;
+        this->y = transformGripper_left.getOrigin().getY() + differenceY;
+        this->z = transformGripper_left.getOrigin().getZ() + differenceZ;
+      }
+      if (isGripperRightCollision(transformGripper_left, transformGripper_right))
+      {
+        this->x = transformGripper_right.getOrigin().getX() + differenceX;
+        this->y = transformGripper_right.getOrigin().getY() + differenceY;
+        this->z = transformGripper_right.getOrigin().getZ() + differenceZ;
+      }
+    }
     if (this->stucked == false && (this->z > 0))
     {
 
       this->z = this->z - 0.000005;
-
       //this->displayMarker();
       std::thread t2(this->displayMarker, this);
       t2.join();
@@ -113,6 +128,26 @@ bool Marker::Marker::checkStucked(tf::StampedTransform transformGripper_right, t
 
           (transformGripper_left.getOrigin().getZ() < this->z + marker.scale.z / 2) &&
           (transformGripper_left.getOrigin().getZ() > this->z - marker.scale.z / 2) &&
+          (transformGripper_right.getOrigin().getZ() < this->z + marker.scale.z / 2) &&
+          (transformGripper_right.getOrigin().getZ() > this->z - marker.scale.z / 2));
+}
+
+bool Marker::Marker::isGripperLeftCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left)
+{
+  return ((transformGripper_left.getOrigin().getX() < this->x + marker.scale.x / 2) &&
+          (transformGripper_left.getOrigin().getX() > this->x - marker.scale.x / 2) &&
+          (transformGripper_left.getOrigin().getY() < this->y + marker.scale.y / 2) &&
+          (transformGripper_left.getOrigin().getY() > this->y - marker.scale.y / 2) &&
+          (transformGripper_left.getOrigin().getZ() < this->z + marker.scale.z / 2) &&
+          (transformGripper_left.getOrigin().getZ() > this->z - marker.scale.z / 2));
+}
+
+bool Marker::Marker::isGripperRightCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left)
+{
+  return ((transformGripper_right.getOrigin().getX() < this->x + marker.scale.x / 2) &&
+          (transformGripper_right.getOrigin().getX() > this->x - marker.scale.x / 2) &&
+          (transformGripper_right.getOrigin().getY() < this->y + marker.scale.y / 2) &&
+          (transformGripper_right.getOrigin().getY() > this->y - marker.scale.y / 2) &&
           (transformGripper_right.getOrigin().getZ() < this->z + marker.scale.z / 2) &&
           (transformGripper_right.getOrigin().getZ() > this->z - marker.scale.z / 2));
 }

@@ -37,6 +37,8 @@ private:
     bool stucked = false;
     bool checkStucked(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
     void setDifferences(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
+    bool isGripperLeftCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
+    bool isGripperRightCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
     std::string name;
     ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
     uint32_t shape = visualization_msgs::Marker::CYLINDER;

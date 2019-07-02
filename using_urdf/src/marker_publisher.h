@@ -35,6 +35,7 @@ private:
     double differenceoZ = 0;
     double differenceoW = 0;
     bool stucked = false;
+    bool dropped = false;
     bool checkStucked(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
     void setDifferences(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
     bool isGripperLeftCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);

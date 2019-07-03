@@ -19,7 +19,10 @@ void Marker::Marker::markerCallback()
   tf::TransformListener listenerGripper_right;
   tf::TransformListener listenerGripper_left;
   int counter = 0;
-  double differenceTest = 0;
+  int lCounter = 0;
+  double differenceLeft = 0;
+  double differenceRight = 0;
+
   while (this->n.ok())
   {
     tf::StampedTransform transformHand;
@@ -64,18 +67,21 @@ void Marker::Marker::markerCallback()
       {
         if (counter == 0)
         {
-          differenceTest = this->x - transformGripper_right.getOrigin().getX();
+          differenceLeft = this->x - transformGripper_right.getOrigin().getX();
         }
         ++counter;
-        this->x = transformGripper_right.getOrigin().getX() + differenceTest;
+        this->x = transformGripper_right.getOrigin().getX() + differenceLeft;
         this->y = transformGripper_right.getOrigin().getY() - this->marker.scale.y / 2;
-        //this->z = transformGripper_right.getOrigin().getZ();
       }
       if (isGripperRightCollision(transformGripper_left, transformGripper_right))
       {
-        this->x = transformGripper_left.getOrigin().getX();
-        this->y = transformGripper_left.getOrigin().getY() + this->marker.scale.y / 2;
-        //this->z = transformGripper_left.getOrigin().getZ();
+        if (lCounter == 0)
+        {
+          differenceRight = this->x - transformGripper_left.getOrigin().getX();
+        }
+        ++lCounter;
+        this->x = transformGripper_left.getOrigin().getX() + differenceRight;
+        this->y = transformGripper_left.getOrigin().getY();// + this->marker.scale.y / 2;
       }
     }
     if (this->stucked == false && (this->z > 0))
@@ -83,38 +89,36 @@ void Marker::Marker::markerCallback()
       this->dropped = true;
       this->z = this->z - 0.000005;
     }
-    // this->displayMarker();
-    std::thread t1(this->displayMarker, this);
-    t1.join();
+    this->displayMarker();
   }
 }
 
-void Marker::Marker::displayMarker(Marker *m)
+void Marker::Marker::displayMarker()
 {
-  m->marker.header.frame_id = "/base_link";
-  m->marker.header.stamp = ros::Time::now();
-  m->marker.ns = m->name;
-  m->marker.id = 0;
-  m->marker.type = m->shape;
-  m->marker.action = visualization_msgs::Marker::ADD;
-  m->marker.pose.position.x = m->x;
-  m->marker.pose.position.y = m->y;
-  m->marker.pose.position.z = m->z;
-  m->marker.pose.orientation.x = m->oX;
-  m->marker.pose.orientation.y = m->oY;
-  m->marker.pose.orientation.z = m->oZ;
-  m->marker.pose.orientation.w = m->oW;
+  this->marker.header.frame_id = "/base_link";
+  this->marker.header.stamp = ros::Time::now();
+  this->marker.ns = this->name;
+  this->marker.id = 0;
+  this->marker.type = this->shape;
+  this->marker.action = visualization_msgs::Marker::ADD;
+  this->marker.pose.position.x = this->x;
+  this->marker.pose.position.y = this->y;
+  this->marker.pose.position.z = this->z;
+  this->marker.pose.orientation.x = this->oX;
+  this->marker.pose.orientation.y = this->oY;
+  this->marker.pose.orientation.z = this->oZ;
+  this->marker.pose.orientation.w = this->oW;
 
-  m->marker.scale.x = 0.03;
-  m->marker.scale.y = 0.03;
-  m->marker.scale.z = 0.03;
+  this->marker.scale.x = 0.03;
+  this->marker.scale.y = 0.03;
+  this->marker.scale.z = 0.03;
 
-  m->marker.color.r = 1.0f;
-  m->marker.color.g = 0.0f;
-  m->marker.color.b = 0.0f;
-  m->marker.color.a = 1.0;
-  m->marker.lifetime = ros::Duration();
-  m->marker_pub.publish(m->marker);
+  this->marker.color.r = 1.0f;
+  this->marker.color.g = 0.0f;
+  this->marker.color.b = 0.0f;
+  this->marker.color.a = 1.0;
+  this->marker.lifetime = ros::Duration();
+  this->marker_pub.publish(this->marker);
 }
 
 bool Marker::Marker::checkStucked(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left)
@@ -173,8 +177,7 @@ int main(int argc, char **argv)
   Marker::Marker m(0.19, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, "cyllinder1");
   sleep(5);
   //m.displayMarker();
-  std::thread t1(m.displayMarker, &m);
-  t1.join();
+  m.displayMarker();
 
   m.markerCallback();
 

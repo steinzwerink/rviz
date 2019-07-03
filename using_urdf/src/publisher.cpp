@@ -32,11 +32,18 @@ int main(int argc, char **argv)
     pose::pose p2("#6 P1800 #7 P1800 T1000 ", 1);
     pose::pose p3("#2 P1350 #3 P1500 #4 P1100 T12000 ", 12);
     pose::pose p4("#6 P1750 #7 P1750 T1000 ", 1);
-    pose::pose p5("#2 P1150 #3 P2500 #4 P1900 T2000 ", 2);
-    pose::pose p6("#1 P1000 #2 P1150 #3 P2500 #4 P1900 T2000 ", 2);
-    pose::pose p7("#1 P2000 #2 P1150 #3 P2500 #4 P1900 T18000 ", 18);
+    pose::pose p5("#1 P1000 T1000 ", 1);
+    pose::pose p6("#2 P1150 #3 P2500 #4 P1900 T2000 ", 2);
+    pose::pose p7("#1 P1000 #2 P1150 #3 P2500 #4 P1900 T2000 ", 2);
+    pose::pose p8("#1 P1600 #2 P1150 #3 P2500 #4 P1900 T15000 ", 15);
+    pose::pose p9("#1 P1500 #2 P1150 #3 P2500 #4 P1900 T2000 ", 2);
+    pose::pose p10("#1 P1500 #2 P1350 #3 P2500 #4 P1900 T2000 ", 2);
+    pose::pose p11("#1 P2000 #2 P1350 #3 P2500 #4 P1900 T2000 ", 2);
+    pose::pose p12("#1 P2000 #2 P1150 #3 P2500 #4 P1900 T2000 ", 2);
+    pose::pose p13("#1 P1530 #2 P1150 #3 P2500 #4 P1900 T10000 ", 10);
+    pose::pose p14("#1 P2000 T1000 ", 1);
 
-    std::vector<pose::pose> movement = {p1, p2, p3, p4, p5, p6, p7};
+    std::vector<pose::pose> movement = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14};
     ros::Duration(6).sleep();
     while (ros::ok())
     {
@@ -52,7 +59,7 @@ int main(int argc, char **argv)
             loop_rate.sleep();
             ++count;
         }
-        break;
+       // break;
     }
 
     return 0;

@@ -16,7 +16,7 @@ public:
     virtual ~Marker();
     void markerCallback();
     ros::NodeHandle n;
-    static void displayMarker(Marker* m);
+    void displayMarker();
 
 private:
     double x;

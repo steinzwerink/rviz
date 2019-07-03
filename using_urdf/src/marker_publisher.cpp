@@ -18,6 +18,8 @@ void Marker::Marker::markerCallback()
   tf::TransformListener listenerHand;
   tf::TransformListener listenerGripper_right;
   tf::TransformListener listenerGripper_left;
+  int counter = 0;
+  double differenceTest = 0;
   while (this->n.ok())
   {
     tf::StampedTransform transformHand;
@@ -50,10 +52,6 @@ void Marker::Marker::markerCallback()
       //this->oY = (transformHand.getRotation().getY() - differenceoY) ;
       //this->oZ = (transformHand.getRotation().getZ() - differenceoZ) ;
       //this->oW = (transformHand.getRotation().getW() - differenceoW) ;
-
-      std::thread t1(this->displayMarker, this);
-      t1.join();
-      // this->displayMarker();
     }
     else
     {
@@ -64,31 +62,30 @@ void Marker::Marker::markerCallback()
     {
       if (isGripperLeftCollision(transformGripper_left, transformGripper_right))
       {
-        //ROS_ERROR("left collision");
-        this->x = transformGripper_right.getOrigin().getX() - this->marker.scale.x / 2;
+        if (counter == 0)
+        {
+          differenceTest = this->x - transformGripper_right.getOrigin().getX();
+        }
+        ++counter;
+        this->x = transformGripper_right.getOrigin().getX() + differenceTest;
         this->y = transformGripper_right.getOrigin().getY() - this->marker.scale.y / 2;
-        this->z = transformGripper_right.getOrigin().getZ(); //- differenceZ - this->marker.scale.z / 2;
-        std::thread t2(this->displayMarker, this);
-        t2.join();
+        //this->z = transformGripper_right.getOrigin().getZ();
       }
       if (isGripperRightCollision(transformGripper_left, transformGripper_right))
       {
-        // ROS_ERROR("right collision");
-        this->x = transformGripper_left.getOrigin().getX() + differenceX + this->marker.scale.x / 2;
-        this->y = transformGripper_left.getOrigin().getY() + differenceY + this->marker.scale.y / 2;
-        this->z = transformGripper_left.getOrigin().getZ() + differenceZ + this->marker.scale.z / 2;
-        std::thread t3(this->displayMarker, this);
-        t3.join();
+        this->x = transformGripper_left.getOrigin().getX();
+        this->y = transformGripper_left.getOrigin().getY() + this->marker.scale.y / 2;
+        //this->z = transformGripper_left.getOrigin().getZ();
       }
     }
     if (this->stucked == false && (this->z > 0))
     {
       this->dropped = true;
       this->z = this->z - 0.000005;
-      //this->displayMarker();
-      std::thread t4(this->displayMarker, this);
-      t4.join();
     }
+    // this->displayMarker();
+    std::thread t1(this->displayMarker, this);
+    t1.join();
   }
 }
 

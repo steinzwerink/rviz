@@ -22,6 +22,7 @@ void Marker::Marker::markerCallback()
   int lCounter = 0;
   double differenceLeft = 0;
   double differenceRight = 0;
+  double differenceRightTest = 0;
 
   while (this->n.ok())
   {
@@ -78,11 +79,29 @@ void Marker::Marker::markerCallback()
         if (lCounter == 0)
         {
           differenceRight = this->x - transformGripper_left.getOrigin().getX();
+          differenceRightTest = transformGripper_left.getOrigin().getY() - this->y;
         }
         ++lCounter;
         this->x = transformGripper_left.getOrigin().getX() + differenceRight;
-        this->y = transformGripper_left.getOrigin().getY();// + this->marker.scale.y / 2;
+        this->y = transformGripper_left.getOrigin().getY() + differenceRightTest;
       }
+    }
+
+    if (ros::Time::now().toSec() - timeSinceStart >= 64)
+    {
+      ROS_ERROR("TIME PASSED");
+      this->x = 0.19;
+      this->y = 0; 
+      this->z = 0;
+      this->dropped = false;
+      this->timeSinceStart = ros::Time::now().toSec();
+    }
+
+    if (transformGripper_right.getOrigin().getZ() && transformGripper_left.getOrigin().getZ() >= 0.2 && this->z <= 0)
+    {
+      //this->dropped = false;
+      counter = 0;
+      lCounter = 0;
     }
     if (this->stucked == false && (this->z > 0))
     {
@@ -170,6 +189,11 @@ void Marker::Marker::setDifferences(tf::StampedTransform transformGripper_right,
   // differenceoW = std::abs(transformHand.getRotation().getW() - this->oW);
 }
 
+void Marker::Marker::setTimeSinceStart(double time)
+{
+  this->timeSinceStart = time;
+}
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "marker");
@@ -177,6 +201,7 @@ int main(int argc, char **argv)
   Marker::Marker m(0.19, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, "cyllinder1");
   sleep(5);
   //m.displayMarker();
+  m.setTimeSinceStart(ros::Time::now().toSec());
   m.displayMarker();
 
   m.markerCallback();

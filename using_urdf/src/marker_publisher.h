@@ -17,6 +17,7 @@ public:
     void markerCallback();
     ros::NodeHandle n;
     void displayMarker();
+    void setTimeSinceStart(double time);
 
 private:
     double x;
@@ -34,6 +35,7 @@ private:
     double differenceoY = 0;
     double differenceoZ = 0;
     double differenceoW = 0;
+    double timeSinceStart = 0;
     bool stucked = false;
     bool dropped = false;
     bool checkStucked(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);

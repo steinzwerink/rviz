@@ -40,10 +40,13 @@ int main(int argc, char **argv)
     pose::pose p10("#1 P1500 #2 P1350 #3 P2500 #4 P1900 T2000 ", 2);
     pose::pose p11("#1 P2000 #2 P1350 #3 P2500 #4 P1900 T2000 ", 2);
     pose::pose p12("#1 P2000 #2 P1150 #3 P2500 #4 P1900 T2000 ", 2);
-    pose::pose p13("#1 P1530 #2 P1150 #3 P2500 #4 P1900 T10000 ", 10);
+    pose::pose p13("#1 P1530 #2 P1150 #3 P2500 #4 P1900 T15000 ", 15);
     pose::pose p14("#1 P2000 T1000 ", 1);
+    pose::pose p15("#2 P1500 #3 P2100 #4 P1500 T2000 ", 2);
+    pose::pose p16("#1 P1500 T1000 ", 1);
+    pose::pose p17("#6 P500 #7 P500 T1000 ", 1);
 
-    std::vector<pose::pose> movement = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14};
+    std::vector<pose::pose> movement = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17};
     ros::Duration(6).sleep();
     while (ros::ok())
     {
@@ -59,7 +62,7 @@ int main(int argc, char **argv)
             loop_rate.sleep();
             ++count;
         }
-       // break;
+        //break;
     }
 
     return 0;

@@ -42,7 +42,7 @@ void Marker::Marker::markerCallback()
       continue;
     }
 
-    if (checkStucked(transformGripper_left, transformGripper_right))
+    if (isGripperLeftCollision(transformGripper_left, transformGripper_right) && isGripperRightCollision(transformGripper_left, transformGripper_right))
     {
       if (this->stucked == false)
       {
@@ -52,10 +52,6 @@ void Marker::Marker::markerCallback()
       this->x = ((transformGripper_right.getOrigin().getX() + transformGripper_left.getOrigin().getX()) / 2) + differenceX;
       this->y = ((transformGripper_right.getOrigin().getY() + transformGripper_left.getOrigin().getY()) / 2) + differenceY;
       this->z = ((transformGripper_right.getOrigin().getZ() + transformGripper_left.getOrigin().getZ()) / 2) + differenceZ;
-      // this->oX = (transformHand.getRotation().getX() - differenceoX) ;
-      //this->oY = (transformHand.getRotation().getY() - differenceoY) ;
-      //this->oZ = (transformHand.getRotation().getZ() - differenceoZ) ;
-      //this->oW = (transformHand.getRotation().getW() - differenceoW) ;
     }
     else
     {
@@ -87,11 +83,10 @@ void Marker::Marker::markerCallback()
       }
     }
 
-    if (ros::Time::now().toSec() - timeSinceStart >= 64)
+    if (ros::Time::now().toSec() - timeSinceStart >= (64 + 15))
     {
-      ROS_ERROR("TIME PASSED");
       this->x = 0.19;
-      this->y = 0; 
+      this->y = 0;
       this->z = 0;
       this->dropped = false;
       this->timeSinceStart = ros::Time::now().toSec();

@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     pose::pose p10("#1 P1500 #2 P1350 #3 P2500 #4 P1900 T2000 ", 2);
     pose::pose p11("#1 P2000 #2 P1350 #3 P2500 #4 P1900 T2000 ", 2);
     pose::pose p12("#1 P2000 #2 P1150 #3 P2500 #4 P1900 T2000 ", 2);
-    pose::pose p13("#1 P1530 #2 P1150 #3 P2500 #4 P1900 T15000 ", 15);
+    pose::pose p13("#1 P1530 #2 P1150 #3 P2500 #4 P1900 T30000 ", 30);
     pose::pose p14("#1 P2000 T1000 ", 1);
     pose::pose p15("#2 P1500 #3 P2100 #4 P1500 T2000 ", 2);
     pose::pose p16("#1 P1500 T1000 ", 1);
@@ -52,7 +52,6 @@ int main(int argc, char **argv)
     {
         for (const auto &p : movement)
         {
-
             std_msgs::String msg;
             msg.data = p.pose_name;
             pose_pub.publish(msg);

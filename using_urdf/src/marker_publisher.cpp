@@ -12,9 +12,63 @@ Marker::Marker::~Marker()
 {
 }
 
+void Marker::Marker::checkDirections(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left)
+{
+
+  if (transformGripper_right.getOrigin().getZ() != lastRightZ)
+  {
+    float a = transformGripper_right.getOrigin().getZ();
+    float b = lastRightZ;
+
+    float c = transformGripper_right.getOrigin().getY();
+    float d = lastRightY;
+
+    // ROS_ERROR("%lf", transformGripper_right.getOrigin().getX());
+
+    if (a == b)
+    {
+      controlNumbers.push_back(a);
+      controlNumbers.push_back(b);
+
+      if (controlNumberscounter == 2)
+      {
+        controlNumberscounter = 0;
+
+        if (std::adjacent_find(controlNumbers.begin(), controlNumbers.end(), std::not_equal_to<>()) == controlNumbers.end())
+        {
+          if (transformGripper_right.getOrigin().getX() > 0)
+          {
+            if (lastRightYvals.size() % 10 == 0)
+            {
+              if (transformGripper_right.getOrigin().getY() < lastRightYvals[0])
+              {
+                this->grippers[0].movingDirectionD = movingDirection::right;
+                ROS_ERROR("RIGHT");
+              }
+              if (transformGripper_right.getOrigin().getY() > lastRightYvals[0])
+              {
+                this->grippers[0].movingDirectionD = movingDirection::left;
+                ROS_ERROR("LEFT");
+              }
+              lastRightYvals.clear();
+            }
+          }
+        }
+        else
+        {
+          this->grippers[0].movingDirectionD = movingDirection::notMoving;
+        }
+
+        controlNumbers.clear();
+      }
+      ++controlNumberscounter;
+    }
+  }
+}
+
 void Marker::Marker::markerCallback()
 {
-  ros::Rate rate(10.0);
+  //ros::Rate rate(10.0);
   tf::TransformListener listenerHand;
   tf::TransformListener listenerGripper_right;
   tf::TransformListener listenerGripper_left;
@@ -41,6 +95,7 @@ void Marker::Marker::markerCallback()
       ros::Duration(1.0).sleep();
       continue;
     }
+    checkDirections(transformGripper_right, transformGripper_left);
 
     if (isGripperLeftCollision(transformGripper_left, transformGripper_right) && isGripperRightCollision(transformGripper_left, transformGripper_right))
     {
@@ -60,21 +115,42 @@ void Marker::Marker::markerCallback()
 
     if (this->stucked == false && this->z < 0.1 && this->dropped == true)
     {
-      if (isGripperLeftCollision(transformGripper_left, transformGripper_right))
+      if (isGripperLeftCollision(transformGripper_left, transformGripper_right)) //checks right collision
       {
         if (counter == 0)
         {
-          differenceLeft = this->x - transformGripper_right.getOrigin().getX();
+          if (this->grippers[0].movingDirectionD == movingDirection::left)
+          {
+            differenceLeft = this->x + transformGripper_right.getOrigin().getX();
+          }
+          if (this->grippers[0].movingDirectionD == movingDirection::right)
+          {
+            differenceLeft = this->x - transformGripper_right.getOrigin().getX();
+          }
         }
         ++counter;
-        this->x = transformGripper_right.getOrigin().getX() + differenceLeft;
-        this->y = transformGripper_right.getOrigin().getY() - this->marker.scale.y / 2;
+        if (this->grippers[0].movingDirectionD == movingDirection::left)
+        {
+          this->x = transformGripper_right.getOrigin().getX() + differenceLeft;
+        }
+        if (this->grippers[0].movingDirectionD == movingDirection::right)
+        {
+          this->x = transformGripper_right.getOrigin().getX() + differenceLeft;
+        }
+        if (this->grippers[0].movingDirectionD == movingDirection::left)
+        {
+          this->y = transformGripper_right.getOrigin().getY() + this->marker.scale.y / 2;
+        }
+        if (this->grippers[0].movingDirectionD == movingDirection::right)
+        {
+          this->y = transformGripper_right.getOrigin().getY() - this->marker.scale.y / 2;
+        }
       }
       if (isGripperRightCollision(transformGripper_left, transformGripper_right))
       {
         if (lCounter == 0)
         {
-          differenceRight = this->x - transformGripper_left.getOrigin().getX();
+          differenceRight = this->x - transformGripper_left.getOrigin().getX(); //checks left collision
           differenceRightTest = transformGripper_left.getOrigin().getY() - this->y;
         }
         ++lCounter;
@@ -103,6 +179,16 @@ void Marker::Marker::markerCallback()
       this->dropped = true;
       this->z = this->z - 0.000005;
     }
+
+    lastRightX = transformGripper_right.getOrigin().getX();
+    lastRightY = transformGripper_right.getOrigin().getY();
+    lastRightZ = transformGripper_right.getOrigin().getZ();
+    lastLeftX = transformGripper_left.getOrigin().getX();
+    lastLeftY = transformGripper_left.getOrigin().getY();
+    lastLeftZ = transformGripper_left.getOrigin().getZ();
+
+    lastRightYvals.push_back(lastRightY);
+
     this->displayMarker();
   }
 }
@@ -135,24 +221,6 @@ void Marker::Marker::displayMarker()
   this->marker_pub.publish(this->marker);
 }
 
-bool Marker::Marker::checkStucked(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left)
-{
-  return ((transformGripper_left.getOrigin().getX() < this->x + marker.scale.x / 2) &&
-          (transformGripper_left.getOrigin().getX() > this->x - marker.scale.x / 2) &&
-          (transformGripper_right.getOrigin().getX() < this->x + marker.scale.x / 2) &&
-          (transformGripper_right.getOrigin().getX() > this->x - marker.scale.x / 2) &&
-
-          (transformGripper_left.getOrigin().getY() < this->y + marker.scale.y / 2) &&
-          (transformGripper_left.getOrigin().getY() > this->y - marker.scale.y / 2) &&
-          (transformGripper_right.getOrigin().getY() < this->y + marker.scale.y / 2) &&
-          (transformGripper_right.getOrigin().getY() > this->y - marker.scale.y / 2) &&
-
-          (transformGripper_left.getOrigin().getZ() < this->z + marker.scale.z / 2) &&
-          (transformGripper_left.getOrigin().getZ() > this->z - marker.scale.z / 2) &&
-          (transformGripper_right.getOrigin().getZ() < this->z + marker.scale.z / 2) &&
-          (transformGripper_right.getOrigin().getZ() > this->z - marker.scale.z / 2));
-}
-
 bool Marker::Marker::isGripperLeftCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left)
 {
   return ((transformGripper_left.getOrigin().getX() < this->x + marker.scale.x / 2) &&
@@ -178,15 +246,19 @@ void Marker::Marker::setDifferences(tf::StampedTransform transformGripper_right,
   differenceX = std::abs(((transformGripper_right.getOrigin().getX() + transformGripper_left.getOrigin().getX()) / 2) - this->x);
   differenceY = std::abs(((transformGripper_right.getOrigin().getY() + transformGripper_left.getOrigin().getY()) / 2) - this->y);
   differenceZ = std::abs(((transformGripper_right.getOrigin().getZ() + transformGripper_left.getOrigin().getZ()) / 2) - this->z);
-  // differenceoX = std::abs(transformHand.getRotation().getX() - this->oX);
-  // differenceoY = std::abs(transformHand.getRotation().getY() - this->oY);
-  // differenceoZ = std::abs(transformHand.getRotation().getZ() - this->oZ);
-  // differenceoW = std::abs(transformHand.getRotation().getW() - this->oW);
 }
 
 void Marker::Marker::setTimeSinceStart(double time)
 {
   this->timeSinceStart = time;
+}
+
+void Marker::Marker::createGrippers()
+{
+  Gripper gripperRight = {"gripperRight", movingDirection::notMoving};
+  this->grippers.push_back(gripperRight);
+  Gripper gripperLeft = {"gripperleft", movingDirection::notMoving};
+  this->grippers.push_back(gripperLeft);
 }
 
 int main(int argc, char **argv)
@@ -195,10 +267,9 @@ int main(int argc, char **argv)
   std::cout << "MARKER" << std::endl;
   Marker::Marker m(0.19, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, "cyllinder1");
   sleep(5);
-  //m.displayMarker();
   m.setTimeSinceStart(ros::Time::now().toSec());
   m.displayMarker();
-
+  m.createGrippers();
   m.markerCallback();
 
   ros::spin();

@@ -9,6 +9,21 @@
 
 namespace Marker
 {
+
+enum class movingDirection
+{
+    notMoving,
+    right,
+    left
+};
+
+typedef struct
+{
+    std::string name;
+    movingDirection movingDirectionD;
+
+} Gripper;
+
 class Marker
 {
 public:
@@ -18,8 +33,10 @@ public:
     ros::NodeHandle n;
     void displayMarker();
     void setTimeSinceStart(double time);
+    void createGrippers();
 
 private:
+    std::vector<Gripper> grippers;
     double x;
     double y;
     double z;
@@ -38,13 +55,27 @@ private:
     double timeSinceStart = 0;
     bool stucked = false;
     bool dropped = false;
-    bool checkStucked(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
+    double gripperPos = 0;
     void setDifferences(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
     bool isGripperLeftCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
     bool isGripperRightCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
+    void checkDirections(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
     std::string name;
     ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
     uint32_t shape = visualization_msgs::Marker::CYLINDER;
     visualization_msgs::Marker marker;
+
+    double lastRightX = 0;
+    double lastRightY = 0;
+    double lastRightZ = 0;
+    double lastLeftX = 0;
+    double lastLeftY = 0;
+    double lastLeftZ = 0;
+
+    std::vector<double> lastRightYvals;
+
+    std::vector<float> controlNumbers;
+    uint8_t controlNumberscounter = 0;
 };
+
 } // namespace Marker

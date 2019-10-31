@@ -12,16 +12,15 @@ Marker::Marker::~Marker()
 {
 }
 
-void Marker::Marker::checkDirections(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left)
+void Marker::Marker::checkDirections(tf::StampedTransform transformGripper_right)
 {
 
   if (transformGripper_right.getOrigin().getZ() != lastRightZ)
   {
-    float a = transformGripper_right.getOrigin().getZ();
-    float b = lastRightZ;
+    float a = (float)transformGripper_right.getOrigin().getZ();
+    float b = (float)lastRightZ;
 
-    float c = transformGripper_right.getOrigin().getY();
-    float d = lastRightY;
+   
 
     // ROS_ERROR("%lf", transformGripper_right.getOrigin().getX());
 
@@ -43,12 +42,12 @@ void Marker::Marker::checkDirections(tf::StampedTransform transformGripper_right
               if (transformGripper_right.getOrigin().getY() < lastRightYvals[0])
               {
                 this->grippers[0].movingDirectionD = movingDirection::right;
-                ROS_ERROR("RIGHT");
+              //  ROS_ERROR("RIGHT");
               }
               if (transformGripper_right.getOrigin().getY() > lastRightYvals[0])
               {
                 this->grippers[0].movingDirectionD = movingDirection::left;
-                ROS_ERROR("LEFT");
+               // ROS_ERROR("LEFT");
               }
               lastRightYvals.clear();
             }
@@ -95,9 +94,9 @@ void Marker::Marker::markerCallback()
       ros::Duration(1.0).sleep();
       continue;
     }
-    checkDirections(transformGripper_right, transformGripper_left);
+    checkDirections(transformGripper_right);
 
-    if (isGripperLeftCollision(transformGripper_left, transformGripper_right) && isGripperRightCollision(transformGripper_left, transformGripper_right))
+    if (isGripperLeftCollision(transformGripper_right) && isGripperRightCollision(transformGripper_left))
     {
       if (this->stucked == false)
       {
@@ -115,7 +114,7 @@ void Marker::Marker::markerCallback()
 
     if (this->stucked == false && this->z < 0.1 && this->dropped == true)
     {
-      if (isGripperLeftCollision(transformGripper_left, transformGripper_right)) //checks right collision
+      if (isGripperLeftCollision(transformGripper_right)) //checks right collision
       {
         if (counter == 0)
         {
@@ -146,7 +145,7 @@ void Marker::Marker::markerCallback()
           this->y = transformGripper_right.getOrigin().getY() - this->marker.scale.y / 2;
         }
       }
-      if (isGripperRightCollision(transformGripper_left, transformGripper_right))
+      if (isGripperRightCollision(transformGripper_left))
       {
         if (lCounter == 0)
         {
@@ -221,7 +220,7 @@ void Marker::Marker::displayMarker()
   this->marker_pub.publish(this->marker);
 }
 
-bool Marker::Marker::isGripperLeftCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left)
+bool Marker::Marker::isGripperLeftCollision(tf::StampedTransform transformGripper_left)
 {
   return ((transformGripper_left.getOrigin().getX() < this->x + marker.scale.x / 2) &&
           (transformGripper_left.getOrigin().getX() > this->x - marker.scale.x / 2) &&
@@ -231,7 +230,7 @@ bool Marker::Marker::isGripperLeftCollision(tf::StampedTransform transformGrippe
           (transformGripper_left.getOrigin().getZ() > this->z - marker.scale.z / 2));
 }
 
-bool Marker::Marker::isGripperRightCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left)
+bool Marker::Marker::isGripperRightCollision(tf::StampedTransform transformGripper_right)
 {
   return ((transformGripper_right.getOrigin().getX() < this->x + marker.scale.x / 2) &&
           (transformGripper_right.getOrigin().getX() > this->x - marker.scale.x / 2) &&

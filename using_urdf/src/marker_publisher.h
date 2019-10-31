@@ -57,9 +57,9 @@ private:
     bool dropped = false;
     double gripperPos = 0;
     void setDifferences(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
-    bool isGripperLeftCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
-    bool isGripperRightCollision(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
-    void checkDirections(tf::StampedTransform transformGripper_right, tf::StampedTransform transformGripper_left);
+    bool isGripperLeftCollision(tf::StampedTransform transformGripper_left);
+    bool isGripperRightCollision(tf::StampedTransform transformGripper_right);
+    void checkDirections(tf::StampedTransform transformGripper_right);
     std::string name;
     ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
     uint32_t shape = visualization_msgs::Marker::CYLINDER;

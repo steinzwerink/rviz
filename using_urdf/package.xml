@@ -5,10 +5,10 @@
   <description>The using_urdf package</description>
 
 
-  <maintainer email="tecera@todo.todo">tecera</maintainer>
+  <maintainer email="SRH.Zwerink@student.han.nl">Stein</maintainer>
+  <maintainer email="TDJ.deWinkel@student.han.nl">Thomas</maintainer>
 
-
-  <license>TODO</license>
+  <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>actionlib</build_depend>

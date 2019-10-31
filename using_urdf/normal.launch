@@ -1,0 +1,10 @@
+<launch>
+  <arg name="gui" default="false" />
+  <param name="robot_description" textfile="$(find using_urdf)/lynxmotion_arm.urdf" />
+  <param name="use_gui" value="$(arg gui)"/>
+  <node name="hld" pkg="using_urdf" type="hld"/>
+  <node name="marker" pkg="using_urdf" type="marker"/>
+  <node name="client" pkg="using_urdf" type="client"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+ <node name="rviz" pkg="rviz" type="rviz" args="-d $(find using_urdf)/lynxmotion.rviz" required="true" />
+</launch>
